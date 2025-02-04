@@ -5,97 +5,89 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.ugb.miprimeraplicacion.R;
 
 public class MainActivity extends AppCompatActivity {
-    Button btn;
-    TextView tempVal; 
-    RadioGroup rgb; 
-    RadioButton opt; 
-    EditText num1, num2;
+
+    private EditText txtNum1, txtNum2;
+    private TextView lblRespuesta;
+    private RadioButton optSuma, optResta, optMultiplicacion, optDivision, optExponente, optPorcentaje, optRaiz, optFactorial;
+    private Button btnCalcular;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btn = findViewById(R.id.btnCalcular);
-        num1 = findViewById(R.id.txtNum1);
-        num2 = findViewById(R.id.txtNum2);
-        rgb = findViewById(R.id.rgoOpciones);
+        txtNum1 = findViewById(R.id.txtNum1);
+        txtNum2 = findViewById(R.id.txtNum2);
+        lblRespuesta = findViewById(R.id.lblRespuesta);
+        optSuma = findViewById(R.id.optSuma);
+        optResta = findViewById(R.id.optResta);
+        optMultiplicacion = findViewById(R.id.optMultiplicacion);
+        optDivision = findViewById(R.id.optDivision);
+        optExponente = findViewById(R.id.optExponente);
+        optPorcentaje = findViewById(R.id.optPorcentaje);
+        optRaiz = findViewById(R.id.optRaiz);
+        optFactorial = findViewById(R.id.optFactorial);
+        btnCalcular = findViewById(R.id.btnCalcular);
 
-        rgb.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.optRaiz || checkedId == R.id.optFactorial ) {
-                    num2.setText("");
-                    num2.setEnabled(false);
-                } else {
-                    num2.setEnabled(true);
-                }
-            }
-        });
-
-        btn.setOnClickListener(new View.OnClickListener() {
+        btnCalcular.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tempVal = findViewById(R.id.txtNum1);
-                double num1 = Double.parseDouble(tempVal.getText().toString());
-                tempVal = findViewById(R.id.txtNum2);
-                double num2 = tempVal.isEnabled() ? Double.parseDouble(tempVal.getText().toString()) : 0;
-                double respuesta = 0.0;
-
-                opt = findViewById(R.id.optSuma);
-                if (opt.isChecked()) {
-                    respuesta = num1 + num2;
-                }
-                opt = findViewById(R.id.optResta);
-                if (opt.isChecked()) {
-                    respuesta = num1 - num2;
-                }
-                opt = findViewById(R.id.optMultiplicacion);
-                if (opt.isChecked()) {
-                    respuesta = num1 * num2;
-                }
-                opt = findViewById(R.id.optDivision);
-                if (opt.isChecked()) {
-                    respuesta = num1 / num2;
-                }
-                opt = findViewById(R.id.optExponente);
-                if (opt.isChecked()) {
-                    respuesta = Math.pow(num1, num2);
-                }
-                opt = findViewById(R.id.optPorcentaje);
-                if (opt.isChecked()) {
-                    respuesta = (num1 * num2) / 100;
-                }
-                opt = findViewById(R.id.optRaiz);
-                if (opt.isChecked()) {
-                    respuesta = Math.sqrt(num1);
-                }
-                opt= findViewById(R.id.optFactorial);
-                if (opt.isChecked()){
-                    respuesta = 1;
-                    for (int i = 2; i <= num1; i++){
-                        respuesta *= i;
-                    }
-                }
-
-
-
-                tempVal = findViewById(R.id.lblRespuesta);
-                tempVal.setText("Respuesta: " + respuesta);
+                calcular();
             }
         });
+    }
+
+    private void calcular() {
+        double num1 = Double.parseDouble(txtNum1.getText().toString());
+        double num2 = Double.parseDouble(txtNum2.getText().toString());
+        double resultado = 0;
+
+        if (optSuma.isChecked()) {
+            resultado = num1 + num2;
+        } else if (optResta.isChecked()) {
+            resultado = num1 - num2;
+        } else if (optMultiplicacion.isChecked()) {
+            resultado = num1 * num2;
+        } else if (optDivision.isChecked()) {
+            if (num2 != 0) {
+                resultado = num1 / num2;
+            } else {
+                lblRespuesta.setText("Error: División por cero");
+                return;
+            }
+        } else if (optExponente.isChecked()) {
+            resultado = Math.pow(num1, num2);
+        } else if (optPorcentaje.isChecked()) {
+            resultado = (num1 * num2) / 100;
+        } else if (optRaiz.isChecked()) {
+            if (num1 >= 0) {
+                resultado = Math.sqrt(num1);
+            } else {
+                lblRespuesta.setText("Error: Raíz de número negativo");
+                return;
+            }
+        } else if (optFactorial.isChecked()) {
+            if (num1 >= 0 && num1 == (int) num1) {
+                resultado = factorial((int) num1);
+            } else {
+                lblRespuesta.setText("Error: Factorial de número no entero o negativo");
+                return;
+            }
+        }
+
+        lblRespuesta.setText("Respuesta: " + resultado);
+    }
+
+    private int factorial(int n) {
+        if (n == 0 || n == 1) {
+            return 1;
+        }
+        return n * factorial(n - 1);
     }
 }
